@@ -1,0 +1,148 @@
+---
+// سنقوم لاحقاً بربط اللغات، حالياً نبني الواجهة
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    
+    <!-- اسم الموقع -->
+    <a href="/" class="brand">
+      <span class="brand-accent">وكالة</span> الأنباء الإسلامية
+    </a>
+
+    <!-- أزرار التنقل -->
+    <nav class="main-nav">
+      <a href="/">الرئيسية</a>
+      <a href="/privacy">الخصوصية</a>
+      <a href="/contact">تواصل معنا</a>
+    </nav>
+
+    <!-- أدوات التحكم (اللغة + الوضع الليلي) -->
+    <div class="controls">
+      <select class="lang-select" aria-label="اختر اللغة">
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+        <option value="fr">Français</option>
+        <option value="de">Deutsch</option>
+        <option value="ru">Русский</option>
+        <option value="ja">日本語</option>
+      </select>
+
+      <button id="theme-toggle" class="theme-toggle" aria-label="تبديل الوضع الليلي">
+        <span id="theme-icon">🌙</span>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<script>
+  // سكربت تشغيل الوضع الليلي وتغيير الأيقونة
+  const toggleBtn = document.getElementById('theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const html = document.documentElement;
+
+  const updateIcon = () => {
+    if (html.getAttribute('data-theme') === 'dark') {
+      themeIcon.textContent = '☀️';
+    } else {
+      themeIcon.textContent = '🌙';
+    }
+  };
+
+  updateIcon();
+
+  toggleBtn?.addEventListener('click', () => {
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    updateIcon();
+  });
+</script>
+
+<style>
+  .site-header {
+    background: var(--card-bg);
+    border-bottom: 3px solid var(--accent);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .brand {
+    font-size: 22px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+  }
+
+  .brand-accent {
+    color: var(--accent);
+  }
+
+  .main-nav {
+    display: flex;
+    gap: 16px;
+    font-weight: 600;
+    font-size: 15px;
+  }
+
+  .main-nav a:hover {
+    color: var(--accent);
+  }
+
+  .controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .lang-select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-alt);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .theme-toggle {
+    background: var(--bg-alt);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.2s;
+  }
+
+  .theme-toggle:hover {
+    transform: scale(1.1);
+  }
+
+  @media (max-width: 600px) {
+    .header-inner {
+      flex-direction: column;
+      text-align: center;
+    }
+    .main-nav {
+      justify-content: center;
+    }
+  }
+</style>
