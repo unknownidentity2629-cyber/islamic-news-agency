@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+---
+
+<BaseLayout title="الصفحة غير موجودة">
+  <Header />
+
+  <main class="container main-content">
+    <div class="error-container">
+      <h1 class="error-code">404</h1>
+      <h2 class="error-title">عذراً، الصفحة غير موجودة</h2>
+      <p class="error-desc">يبدو أن الرابط الذي تحاول الوصول إليه غير صحيح، أو أن الخبر قد تم حذفه أو نقله.</p>
+      <a href="/" class="home-btn">العودة للصفحة الرئيسية</a>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .main-content {
+    padding-top: 60px;
+    padding-bottom: 60px;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .error-container {
+    background: var(--card-bg);
+    padding: 50px 30px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    max-width: 600px;
+    width: 100%;
+  }
+
+  .error-code {
+    font-size: 80px;
+    font-weight: 900;
+    color: var(--accent);
+    margin: 0;
+    line-height: 1;
+    text-shadow: 2px 2px 10px rgba(192, 57, 43, 0.2);
+  }
+
+  .error-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin: 20px 0 10px;
+    color: var(--text);
+  }
+
+  .error-desc {
+    color: var(--muted);
+    font-size: 16px;
+    margin-bottom: 30px;
+    line-height: 1.6;
+  }
+
+  .home-btn {
+    display: inline-block;
+    background: var(--accent);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: bold;
+    font-size: 16px;
+    transition: background 0.2s, transform 0.2s;
+  }
+
+  .home-btn:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+  }
+</style>
