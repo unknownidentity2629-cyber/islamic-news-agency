@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import Translator from '../components/Translator.astro';
 
 interface Props {
   title?: string;
@@ -21,7 +22,6 @@ const {
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title === "وكالة الأنباء الإسلامية" ? title : `${title} | وكالة الأنباء الإسلامية`}</title>
     
-    <!-- سكربت بسيط لتذكر الوضع الليلي عند التنقل بين الصفحات -->
     <script is:inline>
       const theme = localStorage.getItem('theme');
       if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -30,6 +30,7 @@ const {
     </script>
   </head>
   <body>
+    <Translator />
     <slot />
   </body>
 </html>
