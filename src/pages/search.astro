@@ -1,0 +1,178 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import NewsCard from '../components/NewsCard.astro';
+import { getCollection } from 'astro:content';
+
+// جلب كلمة البحث من الرابط (مثلاً: /search?q=عاجل)
+const url = new URL(Astro.request.url);
+const query = url.searchParams.get('q')?.trim() || '';
+
+// جلب كل الأخبار والتصنيفات
+const allNews = await getCollection('news', ({ data }) => !data.draft);
+const categories = await getCollection('categories');
+
+// فلترة الأخبار بناءً على كلمة البحث في العنوان أو الملخص
+let results = [];
+if (query) {
+  results = allNews.filter(article => 
+    article.data.title.includes(query) || 
+    article.data.summary.includes(query)
+  );
+}
+
+// ترتيب النتائج من الأحدث للأقدم
+results.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title={`بحث: ${query}`}>
+  <Header />
+
+  <main class="container main-content">
+    
+    <!-- نموذج البحث (مع تعبئة الكلمة السابقة تلقائياً) -->
+    <div class="search-section">
+      <form action="/search" method="GET" class="search-form">
+        <input 
+          type="text" 
+          name="q" 
+          value={query}
+          placeholder="ابحث عن خبر..." 
+          class="search-input" 
+          required 
+        />
+        <button type="submit" class="search-btn">بحث</button>
+      </form>
+    </div>
+
+    <!-- عنوان النتائج -->
+    <div class="results-header">
+      {query ? (
+        <h1 class="results-title">نتائج البحث عن: <span>"{query}"</span></h1>
+      ) : (
+        <h1 class="results-title">الرجاء إدخال كلمة للبحث</h1>
+      )}
+      {query && <p class="results-count">تم العثور على {results.length} نتيجة</p>}
+    </div>
+
+    <!-- شبكة النتائج -->
+    <section class="news-grid">
+      {results.length > 0 ? (
+        results.map(article => (
+          <NewsCard 
+            title={article.data.title}
+            summary={article.data.summary}
+            date={article.data.date}
+            image={article.data.image}
+            slug={article.slug}
+            categoryName={categories.find(c => c.slug === article.data.category)?.data.name}
+          />
+        ))
+      ) : (
+        query && <p class="no-news">لم يتم العثور على أي أخبار تطابق بحثك. جرب كلمات أخرى.</p>
+      )}
+    </section>
+
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .main-content {
+    padding-top: 30px;
+    padding-bottom: 50px;
+    flex-grow: 1;
+  }
+
+  .search-section {
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .search-form {
+    display: flex;
+    width: 100%;
+    max-width: 600px;
+    gap: 8px;
+  }
+
+  .search-input {
+    flex-grow: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: var(--accent);
+  }
+
+  .search-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    transition: background 0.2s;
+  }
+
+  .search-btn:hover {
+    background: var(--accent-hover);
+  }
+
+  .results-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .results-title {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--text);
+  }
+
+  .results-title span {
+    color: var(--accent);
+  }
+
+  .results-count {
+    color: var(--muted);
+    font-size: 14px;
+    margin-top: 5px;
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .no-news {
+    text-align: center;
+    color: var(--muted);
+    font-size: 18px;
+    grid-column: 1 / -1;
+    padding: 40px 0;
+  }
+
+  @media (max-width: 600px) {
+    .news-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
