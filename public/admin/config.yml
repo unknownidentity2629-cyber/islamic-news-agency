@@ -1,0 +1,26 @@
+backend:
+  name: github
+  repo: news-bureau-7x/islamic-news-agency
+  branch: main
+  base_url: https://api.netlify.com
+  auth_endpoint: auth
+
+locale: 'ar'
+
+media_folder: "public/images"
+public_folder: "/images"
+
+collections:
+  - name: "news"
+    label: "الأخبار"
+    folder: "src/content/news"
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "العنوان", name: "title", widget: "string" }
+      - { label: "الملخص القصير", name: "summary", widget: "text" }
+      - { label: "تاريخ النشر", name: "date", widget: "datetime" }
+      - { label: "التصنيف", name: "category", widget: "select", options: ["domestic"], default: "domestic" }
+      - { label: "صورة الخبر", name: "image", widget: "image", required: false }
+      - { label: "هل الخبر عاجل؟", name: "breaking", widget: "boolean", default: false }
+      - { label: "نص الخبر الكامل", name: "body", widget: "markdown" }
