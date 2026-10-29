@@ -1,0 +1,89 @@
+---
+import { getCollection } from 'astro:content';
+
+// جلب الأخبار التي تحمل علامة "عاجل"
+const breakingNews = await getCollection('news', ({ data }) => data.breaking && !data.draft);
+
+// ترتيبها حسب التاريخ لضمان عرض الأحدث
+const latestBreaking = breakingNews.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())[0];
+---
+
+{latestBreaking && (
+  <div class="breaking-bar">
+    <div class="container breaking-inner">
+      <div class="breaking-badge">عاجل</div>
+      
+      <div class="marquee-container">
+        <a href={`/news/${latestBreaking.slug}`} class="marquee-text">
+          {latestBreaking.data.title} — {latestBreaking.data.summary}
+        </a>
+      </div>
+    </div>
+  </div>
+)}
+
+<style>
+  .breaking-bar {
+    background: #b91c1c; /* أحمر داكن */
+    color: white;
+    overflow: hidden;
+    position: relative;
+    /* تأثير اللمعان (Glow) */
+    box-shadow: 0 0 15px rgba(185, 28, 28, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid #7f1d1d;
+  }
+
+  .breaking-inner {
+    display: flex;
+    align-items: center;
+    height: 40px;
+  }
+
+  .breaking-badge {
+    background: white;
+    color: #b91c1c;
+    padding: 2px 10px;
+    border-radius: 4px;
+    font-weight: 900;
+    font-size: 13px;
+    margin-left: 15px;
+    white-space: nowrap;
+    /* لمعان متقطع للزر */
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7); }
+    70% { box-shadow: 0 0 0 6px rgba(255, 255, 255, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+  }
+
+  .marquee-container {
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .marquee-text {
+    display: inline-block;
+    white-space: nowrap;
+    font-weight: 600;
+    font-size: 15px;
+    color: white;
+    /* حركة النص من اليمين لليسار */
+    animation: marquee 20s linear infinite;
+    padding-right: 100%;
+  }
+
+  .marquee-text:hover {
+    animation-play-state: paused;
+    color: #fca5a5;
+  }
+
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+  }
+</style>
