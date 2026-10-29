@@ -25,7 +25,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: 'npm'
           
       - name: Install Dependencies
         run: npm install
@@ -35,7 +34,7 @@ jobs:
         
       - name: Encrypt with Staticrypt
         run: |
-          npx staticrypt dist -r -d dist_encrypted -p ${{ secrets.SITE_PASSWORD }} --remember 1
+          npx -y staticrypt dist -r -d dist_encrypted -p ${{ secrets.SITE_PASSWORD }} --remember 1
           
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v3
