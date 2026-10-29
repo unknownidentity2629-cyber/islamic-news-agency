@@ -1,0 +1,118 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import NewsCard from '../../components/NewsCard.astro';
+import { getCollection } from 'astro:content';
+
+// إنشاء صفحة تلقائياً لكل تصنيف موجود في المجلد
+export async function getStaticPaths() {
+  const categories = await getCollection('categories');
+  return categories.map(cat => ({
+    params: { category: cat.slug },
+    props: { category: cat },
+  }));
+}
+
+const { category } = Astro.props;
+
+// جلب أخبار هذا التصنيف فقط وترتيبها من الأحدث
+const allNews = await getCollection('news', ({ data }) => !data.draft && data.category === category.slug);
+const sortedNews = allNews.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+---
+
+<BaseLayout title={category.data.name}>
+  <Header />
+
+  <main class="container main-content">
+    
+    <div class="category-header">
+      <a href="/" class="back-link">← العودة للرئيسية</a>
+      <h1 class="category-title">{category.data.name}</h1>
+      {category.data.description && <p class="category-desc">{category.data.description}</p>}
+    </div>
+
+    <section class="news-grid">
+      {sortedNews.length > 0 ? (
+        sortedNews.map(article => (
+          <NewsCard 
+            title={article.data.title}
+            summary={article.data.summary}
+            date={article.data.date}
+            image={article.data.image}
+            slug={article.slug}
+            categoryName={category.data.name}
+          />
+        ))
+      ) : (
+        <p class="no-news">لا توجد أخبار في هذا التصنيف حالياً.</p>
+      )}
+    </section>
+
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .main-content {
+    padding-top: 30px;
+    padding-bottom: 50px;
+    flex-grow: 1;
+  }
+
+  .category-header {
+    background: var(--card-bg);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    border-right: 5px solid var(--accent); /* لمسة جمالية */
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+  }
+
+  .back-link {
+    display: inline-block;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover {
+    color: var(--accent);
+  }
+
+  .category-title {
+    font-size: 26px;
+    font-weight: 900;
+    color: var(--text);
+    margin-bottom: 5px;
+  }
+
+  .category-desc {
+    color: var(--muted);
+    font-size: 15px;
+  }
+
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .no-news {
+    text-align: center;
+    color: var(--muted);
+    font-size: 18px;
+    grid-column: 1 / -1;
+    padding: 40px 0;
+  }
+
+  @media (max-width: 600px) {
+    .news-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
