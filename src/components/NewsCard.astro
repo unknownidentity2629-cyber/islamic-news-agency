@@ -1,0 +1,141 @@
+---
+interface Props {
+  title: string;
+  summary: string;
+  date: Date;
+  image?: string;
+  slug: string;
+  categoryName?: string;
+}
+
+const { title, summary, date, image, slug, categoryName } = Astro.props;
+
+// تنسيق التاريخ باللغة العربية
+const formattedDate = new Intl.DateTimeFormat('ar-EG', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric'
+}).format(date);
+---
+
+<article class="news-card glossy-card">
+  <a href={`/news/${slug}`} class="card-link">
+    
+    <!-- صورة الخبر -->
+    <div class="image-wrapper">
+      {image ? (
+        <img src={image} alt={title} class="card-image" loading="lazy" />
+      ) : (
+        <!-- صورة افتراضية في حال عدم وجود صورة -->
+        <div class="placeholder-image">
+          <span>وكالة الأنباء الإسلامية</span>
+        </div>
+      )}
+    </div>
+
+    <!-- محتوى الخبر (النص تحت الصورة) -->
+    <div class="card-content">
+      {categoryName && <span class="card-category">{categoryName}</span>}
+      <h3 class="card-title">{title}</h3>
+      <p class="card-summary">{summary}</p>
+      <time class="card-date" datetime={date.toISOString()}>{formattedDate}</time>
+    </div>
+
+  </a>
+</article>
+
+<style>
+  .news-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .card-link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .image-wrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9; /* نسبة أبعاد ثابتة للصور لتبدو مرتبة */
+    overflow: hidden;
+    background-color: var(--bg-alt);
+    position: relative;
+  }
+
+  .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+
+  .news-card:hover .card-image {
+    transform: scale(1.05); /* تكبير الصورة قليلاً عند التمرير */
+  }
+
+  .placeholder-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-alt);
+    color: var(--muted);
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .card-content {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .card-category {
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 800;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+  }
+
+  .card-title {
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.4;
+    margin-bottom: 10px;
+    color: var(--text);
+    transition: color 0.2s;
+  }
+
+  .news-card:hover .card-title {
+    color: var(--accent);
+  }
+
+  .card-summary {
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+    flex-grow: 1;
+    
+    /* إخفاء النص الزائد بعد 3 أسطر */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .card-date {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: auto;
+    font-weight: 600;
+  }
+</style>
