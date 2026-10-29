@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://news-bureau-7x.github.io/islamic-news-agency',
+  site: 'https://unknownidentity2629-cyber.github.io/islamic-news-agency',
   output: 'static',
   build: {
     format: 'directory',
