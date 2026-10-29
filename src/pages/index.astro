@@ -1,0 +1,167 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import BreakingBar from '../components/BreakingBar.astro';
+import NewsCard from '../components/NewsCard.astro';
+import { getCollection } from 'astro:content';
+
+// جلب الأخبار غير المسودة وترتيبها من الأحدث للأقدم
+const allNews = await getCollection('news', ({ data }) => !data.draft);
+const sortedNews = allNews.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+// جلب التصنيفات
+const categories = await getCollection('categories');
+---
+
+<BaseLayout title="وكالة الأنباء الإسلامية">
+  <Header />
+  <BreakingBar />
+
+  <main class="container main-content">
+    
+    <!-- شريط البحث -->
+    <div class="search-section">
+      <form action="/search" method="GET" class="search-form">
+        <input type="text" name="q" placeholder="ابحث عن خبر..." class="search-input" required />
+        <button type="submit" class="search-btn">بحث</button>
+      </form>
+    </div>
+
+    <!-- شريط التصنيفات -->
+    <div class="categories-bar">
+      <button class="cat-btn active">الكل</button>
+      {categories.map(cat => (
+        <a href={`/category/${cat.slug}`} class="cat-btn">{cat.data.name}</a>
+      ))}
+    </div>
+
+    <!-- شبكة الأخبار -->
+    <section class="news-grid">
+      {sortedNews.length > 0 ? (
+        sortedNews.map(article => (
+          <NewsCard 
+            title={article.data.title}
+            summary={article.data.summary}
+            date={article.data.date}
+            image={article.data.image}
+            slug={article.slug}
+            categoryName={categories.find(c => c.slug === article.data.category)?.data.name}
+          />
+        ))
+      ) : (
+        <p class="no-news">لا توجد أخبار منشورة حالياً.</p>
+      )}
+    </section>
+
+  </main>
+
+  <Footer />
+</BaseLayout>
+
+<style>
+  .main-content {
+    padding-top: 30px;
+    padding-bottom: 50px;
+    flex-grow: 1;
+  }
+
+  /* تنسيق البحث */
+  .search-section {
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: center;
+  }
+
+  .search-form {
+    display: flex;
+    width: 100%;
+    max-width: 600px;
+    gap: 8px;
+  }
+
+  .search-input {
+    flex-grow: 1;
+    padding: 12px 16px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--card-bg);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus {
+    border-color: var(--accent);
+  }
+
+  .search-btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 0 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    transition: background 0.2s;
+  }
+
+  .search-btn:hover {
+    background: var(--accent-hover);
+  }
+
+  /* تنسيق التصنيفات */
+  .categories-bar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+    justify-content: center;
+  }
+
+  .cat-btn {
+    background: var(--card-bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+
+  .cat-btn:hover, .cat-btn.active {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  /* شبكة الأخبار */
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .no-news {
+    text-align: center;
+    color: var(--muted);
+    font-size: 18px;
+    grid-column: 1 / -1;
+    padding: 40px 0;
+  }
+
+  @media (max-width: 600px) {
+    .news-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
